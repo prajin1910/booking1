@@ -91,15 +91,26 @@ const FlightSearch = () => {
   // Generate sample flights for development/demo purposes
   const generateSampleFlights = () => {
     const airlines = ['SkyWings', 'AeroFly', 'CloudJet', 'SwiftAir', 'BlueWing'];
+    const airports = [
+      { code: 'JFK', city: 'New York' },
+      { code: 'LAX', city: 'Los Angeles' },
+      { code: 'ORD', city: 'Chicago' },
+      { code: 'MIA', city: 'Miami' },
+      { code: 'SFO', city: 'San Francisco' }
+    ];
+    
     const sampleFlights = [];
     
     for (let i = 0; i < 5; i++) {
       const basePrice = 200 + Math.random() * 800;
-      const departureTime = new Date();
+      const departureTime = new Date(searchCriteria.departureDate || Date.now());
       departureTime.setHours(6 + Math.random() * 12);
       
       const arrivalTime = new Date(departureTime);
       arrivalTime.setHours(departureTime.getHours() + 2 + Math.random() * 6);
+      
+      const fromAirport = airports.find(a => a.city.toLowerCase().includes(searchCriteria.from.toLowerCase())) || airports[0];
+      const toAirport = airports.find(a => a.city.toLowerCase().includes(searchCriteria.to.toLowerCase())) || airports[1];
       
       sampleFlights.push({
         _id: `sample-${i}`,
@@ -111,15 +122,17 @@ const FlightSearch = () => {
         route: {
           departure: {
             airport: {
-              code: searchCriteria.from,
-              name: `${searchCriteria.from} International Airport`
+              code: fromAirport.code,
+              name: `${fromAirport.city} International Airport`,
+              city: fromAirport.city
             },
             time: departureTime.toISOString()
           },
           arrival: {
             airport: {
-              code: searchCriteria.to,
-              name: `${searchCriteria.to} International Airport`
+              code: toAirport.code,
+              name: `${toAirport.city} International Airport`,
+              city: toAirport.city
             },
             time: arrivalTime.toISOString()
           }

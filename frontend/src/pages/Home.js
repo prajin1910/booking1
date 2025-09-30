@@ -69,11 +69,18 @@ const Home = () => {
   };
 
   const cities = [
-    'New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia',
-    'San Antonio', 'San Diego', 'Dallas', 'San Jose', 'Austin', 'Jacksonville',
-    'Fort Worth', 'Columbus', 'Charlotte', 'San Francisco', 'Indianapolis', 'Seattle',
-    'Denver', 'Washington', 'Boston', 'El Paso', 'Nashville', 'Detroit', 'Oklahoma City',
-    'Portland', 'Las Vegas', 'Memphis', 'Louisville', 'Baltimore', 'Milwaukee'
+    { code: 'JFK', name: 'New York' },
+    { code: 'LAX', name: 'Los Angeles' },
+    { code: 'ORD', name: 'Chicago' },
+    { code: 'MIA', name: 'Miami' },
+    { code: 'SFO', name: 'San Francisco' },
+    { code: 'SEA', name: 'Seattle' },
+    { code: 'BOS', name: 'Boston' },
+    { code: 'DEN', name: 'Denver' },
+    { code: 'ATL', name: 'Atlanta' },
+    { code: 'DFW', name: 'Dallas' },
+    { code: 'PHX', name: 'Phoenix' },
+    { code: 'LAS', name: 'Las Vegas' }
   ];
 
   return (
@@ -112,7 +119,7 @@ const Home = () => {
                     >
                       <option value="">Select departure city</option>
                       {cities.map(city => (
-                        <option key={city} value={city}>{city}</option>
+                        <option key={city.code} value={city.name}>{city.name} ({city.code})</option>
                       ))}
                     </select>
                   </div>
@@ -132,7 +139,7 @@ const Home = () => {
                     >
                       <option value="">Select destination</option>
                       {cities.map(city => (
-                        <option key={city} value={city}>{city}</option>
+                        <option key={city.code} value={city.name}>{city.name} ({city.code})</option>
                       ))}
                     </select>
                   </div>

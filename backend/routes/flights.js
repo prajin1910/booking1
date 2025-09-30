@@ -18,6 +18,8 @@ router.get('/search', optionalAuth, async (req, res) => {
       limit = 10
     } = req.query;
 
+    console.log('Search params:', { from, to, departureDate, passengers, travelClass });
+
     // Build search query
     const searchQuery = {
       isActive: true,
@@ -25,11 +27,28 @@ router.get('/search', optionalAuth, async (req, res) => {
     };
 
     if (from) {
-      searchQuery['route.departure.airport.code'] = new RegExp(from, 'i');
+      searchQuery.$or = [
+        { 'route.departure.airport.code': new RegExp(from, 'i') },
+        { 'route.departure.airport.city': new RegExp(from, 'i') }
+      ];
     }
 
     if (to) {
-      searchQuery['route.arrival.airport.code'] = new RegExp(to, 'i');
+      if (!searchQuery.$or) searchQuery.$or = [];
+      const arrivalQuery = [
+        { 'route.arrival.airport.code': new RegExp(to, 'i') },
+        { 'route.arrival.airport.city': new RegExp(to, 'i') }
+      ];
+      
+      if (searchQuery.$or.length > 0) {
+        searchQuery.$and = [
+          { $or: searchQuery.$or },
+          { $or: arrivalQuery }
+        ];
+        delete searchQuery.$or;
+      } else {
+        searchQuery.$or = arrivalQuery;
+      }
     }
 
     if (departureDate) {
@@ -49,12 +68,16 @@ router.get('/search', optionalAuth, async (req, res) => {
       searchQuery[classField] = { $gte: parseInt(passengers) };
     }
 
+    console.log('Final search query:', JSON.stringify(searchQuery, null, 2));
+
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const flights = await Flight.find(searchQuery)
       .sort({ 'route.departure.time': 1, 'pricing.economy.price': 1 })
       .skip(skip)
       .limit(parseInt(limit));
+
+    console.log('Found flights:', flights.length);
 
     const totalFlights = await Flight.countDocuments(searchQuery);
 

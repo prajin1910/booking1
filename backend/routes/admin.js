@@ -9,24 +9,52 @@ const router = express.Router();
 // Admin Dashboard Stats
 router.get('/dashboard', adminAuth, async (req, res) => {
   try {
-    // Get total stats
-    const totalFlights = await Flight.countDocuments({ isActive: true });
-    const totalUsers = await User.countDocuments({ role: 'user', isActive: true });
-    const totalBookings = await Booking.countDocuments();
-    
-    // Get revenue stats
-    const revenueResult = await Booking.aggregate([
-      { $match: { bookingStatus: 'confirmed' } },
-      { $group: { _id: null, totalRevenue: { $sum: '$pricing.totalAmount' } } }
+    // Get comprehensive stats
+    const [totalFlights, totalUsers, totalBookings, totalRevenue] = await Promise.all([
+      Flight.countDocuments({ isActive: true }),
+      User.countDocuments({ role: 'user', isActive: true }),
+      Booking.countDocuments(),
+      Booking.aggregate([
+        { $match: { bookingStatus: 'confirmed' } },
+        { $group: { _id: null, total: { $sum: '$pricing.totalAmount' } } }
+      ])
     ]);
-    const totalRevenue = revenueResult.length > 0 ? revenueResult[0].totalRevenue : 0;
+    
+    // Get monthly stats (last 6 months)
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    
+    const [monthlyUsers, monthlyBookings, monthlyRevenue] = await Promise.all([
+      User.countDocuments({ 
+        role: 'user', 
+        createdAt: { $gte: sixMonthsAgo } 
+      }),
+      Booking.countDocuments({ 
+        createdAt: { $gte: sixMonthsAgo } 
+      }),
+      Booking.aggregate([
+        { 
+          $match: { 
+            bookingStatus: 'confirmed',
+            createdAt: { $gte: sixMonthsAgo }
+          } 
+        },
+        { $group: { _id: null, total: { $sum: '$pricing.totalAmount' } } }
+      ])
+    ]);
 
     // Get recent bookings
     const recentBookings = await Booking.find()
       .populate('user', 'username email')
       .populate('flight', 'flightNumber airline route')
       .sort({ createdAt: -1 })
-      .limit(10);
+      .limit(5);
+
+    // Get recent users
+    const recentUsers = await User.find({ role: 'user' })
+      .select('username email profile createdAt')
+      .sort({ createdAt: -1 })
+      .limit(5);
 
     // Get booking stats by status
     const bookingStats = await Booking.aggregate([
@@ -37,10 +65,6 @@ router.get('/dashboard', adminAuth, async (req, res) => {
         }
       }
     ]);
-
-    // Get monthly booking trends (last 6 months)
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
     const monthlyBookings = await Booking.aggregate([
       {
@@ -93,14 +117,26 @@ router.get('/dashboard', adminAuth, async (req, res) => {
       success: true,
       dashboard: {
         stats: {
-          totalFlights,
-          totalUsers,
-          totalBookings,
-          totalRevenue
+          flights: {
+            total: totalFlights,
+            active: totalFlights
+          },
+          users: {
+            total: totalUsers,
+            thisMonth: monthlyUsers
+          },
+          bookings: {
+            total: totalBookings,
+            thisMonth: monthlyBookings
+          },
+          revenue: {
+            total: totalRevenue.length > 0 ? totalRevenue[0].total : 0,
+            thisMonth: monthlyRevenue.length > 0 ? monthlyRevenue[0].total : 0
+          }
         },
         recentBookings,
+        recentUsers,
         bookingStats,
-        monthlyBookings,
         topRoutes
       }
     });

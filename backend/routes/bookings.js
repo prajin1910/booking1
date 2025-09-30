@@ -68,7 +68,7 @@ router.post('/create', auth, async (req, res) => {
     passengers.forEach((passenger, index) => {
       const seatNumber = selectedSeatNumbers[index];
       const seat = flight.seatMap.seats.find(s => s.seatNumber === seatNumber);
-      const classPrice = flight.pricing[seat.class].price;
+      const classPrice = flight.pricing[seat.class]?.price || flight.pricing.economy.price;
       
       basePrice += classPrice;
       totalAmount += seat.price || classPrice;
@@ -129,6 +129,8 @@ router.post('/create', auth, async (req, res) => {
     // Send confirmation email
     try {
       await sendBookingConfirmation(booking, req.user, flight);
+      booking.notifications.emailSent = true;
+      await booking.save();
     } catch (emailError) {
       console.error('Failed to send confirmation email:', emailError);
       // Don't fail the booking if email fails

@@ -12,13 +12,10 @@ const initializeData = async () => {
     // Check if admin user exists
     const adminExists = await User.findOne({ email: 'admin@flights.com' });
     if (!adminExists) {
-      const bcrypt = require('bcryptjs');
-      const hashedPassword = await bcrypt.hash('trilogy123', 10);
-      
       await User.create({
         username: 'admin',
         email: 'admin@flights.com',
-        password: hashedPassword,
+        password: 'trilogy123',
         role: 'admin',
         isActive: true
       });
@@ -43,7 +40,7 @@ const initializeData = async () => {
           route: {
             departure: {
               airport: {
-                code: 'NYC',
+                code: 'JFK',
                 name: 'John F. Kennedy International',
                 city: 'New York',
                 country: 'USA'
@@ -102,7 +99,7 @@ const initializeData = async () => {
           route: {
             departure: {
               airport: {
-                code: 'CHI',
+                code: 'ORD',
                 name: 'Chicago O\'Hare International',
                 city: 'Chicago',
                 country: 'USA'
@@ -204,11 +201,147 @@ const initializeData = async () => {
             business: { price: 449 },
             firstClass: { price: 899 }
           })
+        },
+        {
+          flightNumber: 'BA456',
+          airline: {
+            name: 'BlueAir',
+            code: 'BA',
+            logo: 'https://via.placeholder.com/50'
+          },
+          aircraft: {
+            model: 'Airbus A330-300',
+            totalSeats: 250
+          },
+          route: {
+            departure: {
+              airport: {
+                code: 'BOS',
+                name: 'Boston Logan International',
+                city: 'Boston',
+                country: 'USA'
+              },
+              time: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000),
+              terminal: 'Terminal A'
+            },
+            arrival: {
+              airport: {
+                code: 'DEN',
+                name: 'Denver International Airport',
+                city: 'Denver',
+                country: 'USA'
+              },
+              time: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000 + 4 * 60 * 60 * 1000),
+              terminal: 'Terminal B'
+            }
+          },
+          duration: {
+            hours: 4,
+            minutes: 0
+          },
+          pricing: {
+            economy: {
+              price: 249,
+              availableSeats: 150
+            },
+            business: {
+              price: 649,
+              availableSeats: 25
+            },
+            firstClass: {
+              price: 1199,
+              availableSeats: 12
+            }
+          },
+          status: 'scheduled',
+          isActive: true,
+          seatMap: generateSeatMap('2-4-2', 28, {
+            economy: { price: 249 },
+            business: { price: 649 },
+            firstClass: { price: 1199 }
+          })
+        }
+        {
+          flightNumber: 'CJ301',
+          airline: {
+            name: 'CloudJet',
+            code: 'CJ',
+            logo: 'https://via.placeholder.com/50'
+          },
+          aircraft: {
+            model: 'Boeing 787-9',
+            totalSeats: 292
+          },
+          route: {
+            departure: {
+              airport: {
+                code: 'SFO',
+                name: 'San Francisco International',
+                city: 'San Francisco',
+                country: 'USA'
+              },
+              time: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
+              terminal: 'Terminal 3'
+            },
+            arrival: {
+              airport: {
+                code: 'SEA',
+                name: 'Seattle-Tacoma International',
+                city: 'Seattle',
+                country: 'USA'
+              },
+              time: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000), // 3 days + 2 hours
+              terminal: 'Main Terminal'
+            }
+          },
+          duration: {
+            hours: 2,
+            minutes: 0
+          },
+          pricing: {
+            economy: {
+              price: 149,
+              availableSeats: 200
+            },
+            business: {
+              price: 449,
+              availableSeats: 30
+            },
+            firstClass: {
+              price: 899,
+              availableSeats: 10
+            }
+          },
+          status: 'scheduled',
+          isActive: true,
+          seatMap: generateSeatMap('3-4-3', 30, {
+            economy: { price: 149 },
+            business: { price: 449 },
+            firstClass: { price: 899 }
+          })
         }
       ];
 
       await Flight.insertMany(sampleFlights);
       console.log('Sample flights created');
+    }
+
+    // Create sample user if none exists
+    const userCount = await User.countDocuments({ role: 'user' });
+    if (userCount === 0) {
+      await User.create({
+        username: 'testuser',
+        email: 'user@example.com',
+        password: 'password123',
+        role: 'user',
+        profile: {
+          firstName: 'Test',
+          lastName: 'User',
+          phone: '+1234567890'
+        },
+        isActive: true
+      });
+      console.log('Sample user created');
     }
 
     console.log('Database initialization complete');

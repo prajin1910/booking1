@@ -263,7 +263,7 @@ const SeatSelection = () => {
                   return (
                     <React.Fragment key={seat.seatNumber}>
                       <button
-                        onClick={() => handleSeatClick(seat)}
+                        onClick={() => handleSeatClick(seat.seatNumber)}
                         className={`seat ${getSeatClass(seat)} relative group`}
                         disabled={!seat.isAvailable || seat.isBlocked}
                         title={`${seat.seatNumber} - ${seat.class} - $${getSeatPrice(seat)}`}
