@@ -1,0 +1,20 @@
+# Node.js
+node_modules/
+dist/
+build/
+.cache/
+
+# Logs
+*.log
+
+# Spring Boot / Java
+target/
+*.class
+*.jar
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env
