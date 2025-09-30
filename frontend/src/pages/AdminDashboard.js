@@ -33,15 +33,12 @@ const AdminDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const [statsRes, bookingsRes, usersRes] = await Promise.all([
-        adminAPI.getStats(),
-        adminAPI.getRecentBookings(),
-        adminAPI.getRecentUsers()
-      ]);
+      const response = await adminAPI.getDashboard();
+      const { dashboard } = response.data;
       
-      setStats(statsRes.data);
-      setRecentBookings(bookingsRes.data.bookings);
-      setRecentUsers(usersRes.data.users);
+      setStats(dashboard.stats);
+      setRecentBookings(dashboard.recentBookings);
+      setRecentUsers(dashboard.users || []); // Will add users endpoint if needed
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       toast.error('Failed to load dashboard data');

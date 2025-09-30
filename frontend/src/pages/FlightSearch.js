@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { flightsAPI } from '../utils/api';
-import { FiNavigation, FiClock, FiMapPin, FiCalendar, FiFilter, FiArrowRight, FiUser } from 'react-icons/fi';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { FiArrowRight, FiCalendar, FiClock, FiFilter, FiMapPin, FiNavigation, FiUser } from 'react-icons/fi';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { flightsAPI } from '../utils/api';
 
 const FlightSearch = () => {
   const [searchParams] = useSearchParams();
@@ -27,15 +27,6 @@ const FlightSearch = () => {
     passengers: parseInt(searchParams.get('passengers')) || 1,
     class: searchParams.get('class') || 'economy'
   };
-
-  useEffect(() => {
-    if (searchCriteria.from && searchCriteria.to && searchCriteria.departureDate) {
-      searchFlights();
-    } else {
-      toast.error('Missing search criteria. Please search again from home page.');
-      navigate('/');
-    }
-  }, [searchCriteria.from, searchCriteria.to, searchCriteria.departureDate, sortBy, filters, navigate, searchFlights]);
 
   const searchFlights = useCallback(async (page = 1) => {
     if (!searchCriteria.from || !searchCriteria.to || !searchCriteria.departureDate) {
@@ -87,6 +78,15 @@ const FlightSearch = () => {
       setLoading(false);
     }
   }, [searchCriteria.from, searchCriteria.to, searchCriteria.departureDate, sortBy, filters, navigate]);
+
+  useEffect(() => {
+    if (searchCriteria.from && searchCriteria.to && searchCriteria.departureDate) {
+      searchFlights();
+    } else {
+      toast.error('Missing search criteria. Please search again from home page.');
+      navigate('/');
+    }
+  }, [searchCriteria.from, searchCriteria.to, searchCriteria.departureDate, sortBy, filters, navigate, searchFlights]);
 
   // Generate sample flights for development/demo purposes
   const generateSampleFlights = () => {

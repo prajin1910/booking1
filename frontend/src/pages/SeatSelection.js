@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FiArrowLeft, FiArrowRight, FiClock, FiMapPin, FiNavigation, FiUser } from 'react-icons/fi';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -20,11 +20,6 @@ const SeatSelection = () => {
 
   const searchCriteria = location.state?.searchCriteria || {};
   const requiredPassengers = searchCriteria.passengers || 1;
-
-  useEffect(() => {
-    fetchFlightAndSeats();
-    initializePassengers();
-  }, [flightId]);
 
   const fetchFlightAndSeats = useCallback(async () => {
     try {
@@ -57,6 +52,11 @@ const SeatSelection = () => {
     }));
     setPassengers(passengerList);
   }, [requiredPassengers, user?.username]);
+
+  useEffect(() => {
+    fetchFlightAndSeats();
+    initializePassengers();
+  }, [flightId, fetchFlightAndSeats, initializePassengers]);
 
   const getSeatIcon = (seat) => {
     if (!seat.isAvailable) return '✗';

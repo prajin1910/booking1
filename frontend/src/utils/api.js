@@ -72,9 +72,7 @@ export const bookingsAPI = {
 
 // Admin API
 export const adminAPI = {
-  getStats: () => api.get('/admin/stats'),
-  getRecentBookings: () => api.get('/admin/recent-bookings'),
-  getRecentUsers: () => api.get('/admin/recent-users'),
+  getDashboard: () => api.get('/admin/dashboard'),
   
   // Flights management
   getFlights: (params) => api.get('/admin/flights', { params }),

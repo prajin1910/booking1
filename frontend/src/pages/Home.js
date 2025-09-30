@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { FiNavigation, FiUsers, FiCalendar, FiMap, FiStar, FiClock, FiMapPin, FiArrowRight, FiSearch } from 'react-icons/fi';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { FiArrowRight, FiCalendar, FiClock, FiMap, FiMapPin, FiSearch, FiStar, FiUsers } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
 import { flightsAPI } from '../utils/api';
 
 const Home = () => {
