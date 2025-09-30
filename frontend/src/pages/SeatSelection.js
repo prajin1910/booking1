@@ -284,6 +284,7 @@ const SeatSelection = () => {
                       </button>
                       
                       {isAisle && <div className="w-4"></div>}
+                      }
                     </React.Fragment>
                   );
                 })}
